@@ -26,11 +26,21 @@ class Module extends Module_Base {
 	
 	protected function add_actions() {	
 		add_action( 'elementor/widgets/widgets_registered', [ $this, 'norewp_hide_elementor_modules' ], 20 );
+		add_action( 'elementor/widgets/widgets_registered', [ $this, 'norewp_hide_wordpress_widgets' ], 99 );
 	}
 	
 	function norewp_hide_elementor_modules( $widgets_manager ) {
 		if ( !current_user_can( 'update_core' ) && is_user_logged_in() ) {
 			$widgets_manager->unregister_widget_type( 'heading' );
+		}
+	}
+	
+	function norewp_hide_wordpress_widgets( $widgets_manager ) {
+		if ( !current_user_can( 'update_core' ) && is_user_logged_in() ) {
+			global $wp_widget_factory;
+			foreach ($wp_widget_factory->widgets as $value) {
+				$widgets_manager->unregister_widget_type( 'wp-widget-'. $value->id_base );
+			}
 		}
 	}
 	
